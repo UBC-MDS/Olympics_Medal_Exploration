@@ -1,7 +1,7 @@
 # Project Milestone 1: Proposal
 
 UBC MDS DSCI 532  
-January 2018  
+January 2019   
 Harjyot Kaur & Shayne Andrews
 
 
