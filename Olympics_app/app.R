@@ -1,3 +1,4 @@
+library(rsconnect)
 library(shiny)
 library(tidyverse)
 library(maps)
@@ -59,7 +60,7 @@ ui <- fluidPage(
                                    choices = list("Female" = 1, "Male" = 2),
                                    selected = c(1,2)),
                 
-                pickerInput("country_input","Location", 
+                pickerInput("country_input","Country", 
                             choices=unique(athletes$country),
                             selected = unique(athletes$country),
                             options = list(`actions-box` = TRUE),multiple = T),
@@ -207,12 +208,13 @@ server <- function(input, output) {
                    Height >= input$sideHeight[1],
                    Height <= input$sideHeight[2],
                    Medal_Value %in% input$sideMedals,
+                   Medal!=0,
                    Sex %in% input$sideSex,
                    Sport %in% input$sport_input) %>% 
             ggplot(aes(Year, group=Sport, colour=Sport)) +
             geom_line(aes(fill=..count..), alpha=0.5, stat="bin", binwidth=4,size=2) +
             labs(x="Year",
-                 y="Count of Players")+
+                 y="Medals")+
             theme_classic()+
             theme(
             legend.text=element_text(size=9))
