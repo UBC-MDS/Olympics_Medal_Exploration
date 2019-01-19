@@ -40,4 +40,4 @@ A sketch of the app is available below:
 <br>
 <br>
 
-![dashBoard](img/olympics_app_sketch.jpg)
+![dashBoard](img/app_sketch.jpg)
