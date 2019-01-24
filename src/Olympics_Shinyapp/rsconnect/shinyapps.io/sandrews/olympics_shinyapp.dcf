@@ -5,6 +5,6 @@ account: sandrews
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 642688
-bundleId: 1814427
+bundleId: 1824557
 url: https://sandrews.shinyapps.io/olympics_shinyapp/
-when: 1547511473.15248
+when: 1547935244.4282
