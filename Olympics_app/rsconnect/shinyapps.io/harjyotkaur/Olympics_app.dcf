@@ -1,0 +1,12 @@
+name: Olympics_app
+title: Olympics_app
+username:
+account: harjyotkaur
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 655923
+bundleId: 1838765
+url: https://harjyotkaur.shinyapps.io/Olympics_app/
+when: 1548531315.26683
+asMultiple: FALSE
+asStatic: FALSE
