@@ -30,6 +30,7 @@ dim(athletes)
 ageRange <- c(min(athletes$Age),max(athletes$Age))
 weightRange <- c(min(athletes$Weight),max(athletes$Weight))
 heightRange <- c(min(athletes$Height),max(athletes$Height))
+yearRange <- c(min(athletes$Year),max(athletes$Year))
 
 test_df <-  athletes %>% 
     group_by(Sex) %>% 
@@ -37,89 +38,82 @@ test_df <-  athletes %>%
 
 ui <- fluidPage(
     
-    titlePanel("Olympics Medal Explorer"),
-    
-    fluidPage(
-        title="Olympics Medal Explorer",
+    fluidRow(
+        style = "background-color:#f0f0f0;",
         
-        fluidRow(
-            column(
-                width=3,
-                style = "background-color:#f0f0f0;",
-                
-                strong("Medals"),
-                checkboxGroupInput("sideMedals", label = NULL, 
-                                   choices = list("Gold" = 3, "Silver" = 2, "Bronze" = 1, "No Medal" = 0),
-                                   selected = c(1,2,3)),
-                
-                sliderInput("year_imput", label = h3("Time Line"),
-                            min = 1896, max = 2016, value = c(1896, 2010),width="100%",sep=""
-                ),
-                strong("Sex"),
-                checkboxGroupInput("sideSex", label = NULL, 
-                                   choices = list("Female" = 1, "Male" = 2),
-                                   selected = c(1,2)),
-                
-                pickerInput("country_input","Country", 
-                            choices=unique(athletes$country),
-                            selected = unique(athletes$country),
-                            options = list(`actions-box` = TRUE),multiple = T),
-                
-                pickerInput("sport_input","Sport", 
-                            choices=unique(athletes$Sport),
-                            selected = c("Gymnastics","Swimming","Athletics","Rowing",
-                                         "Cycling"),
-                            options = list(`actions-box` = TRUE),multiple = T),
-                
-                strong("Age"),
-                plotOutput("histAge", height="8%"),
-                sliderInput("sideAge", label = NULL, width="100%",
-                            min = ageRange[1], max = ageRange[2], value = ageRange
-                ),
-                strong("Weight (kg)"),
-                plotOutput("histWeight", height="8%"),
-                sliderInput("sideWeight", label=NULL, width="100%",
-                            min = weightRange[1], max = weightRange[2], value = weightRange
-                ),
-                strong("Height (cm)"),
-                plotOutput("histHeight", height="8%"),
-                sliderInput("sideHeight", label=NULL, width="100%",
-                            min = heightRange[1], max = heightRange[2], value = heightRange
-                )
-            ),
-            column(
-                width=8,
-                tabsetPanel(
-                    tabPanel("Map", 
-                             plotlyOutput("world_map",height = 800)), 
-                    tabPanel("Sports",
-                             plotOutput("word_cloud",height = 700),
-                             br(),
-                             br(),
-                             plotOutput("lineSports",height = 500)
-                             )
-                   
-                    ))
-            
+        column(width = 3,
+               h3("Olympic Medal Explorer"),
+               img(src="rings.png", width="100%")
+        ),
+        column(width = 1,
+               strong("Medals"),
+               checkboxGroupInput("sideMedals", label = NULL,
+                                  choices = list("Gold" = 3, "Silver" = 2, "Bronze" = 1),
+                                  selected = c(1,2,3)),
+               strong("Sex"),
+               checkboxGroupInput("sideSex", label = NULL,
+                                  choices = list("Female" = 1, "Male" = 2),
+                                  selected = c(1,2))
+        ),
+        column(width = 2,
+               strong("Age"),
+               plotOutput("histAge", height="8%"),
+               sliderInput("sideAge", label = NULL, width="100%",
+                           min = ageRange[1], max = ageRange[2], value = ageRange
+               )
+        ),
+        column(width = 2,
+               strong("Weight (kg)"),
+               plotOutput("histWeight", height="8%"),
+               sliderInput("sideWeight", label=NULL, width="100%",
+                           min = weightRange[1], max = weightRange[2], value = weightRange
+               )
+        ),
+        column(width = 2,
+               strong("Height (cm)"),
+               plotOutput("histHeight", height="8%"),
+               sliderInput("sideHeight", label=NULL, width="100%",
+                           min = heightRange[1], max = heightRange[2], value = heightRange
+               )
         )
-        
-        
-    )
+    ),
     
+    fluidRow(
+        column(width=3, style = "background-color:#f0f0f0;",
+               
+               pickerInput("country_input","Country", 
+                           choices=sort(unique(athletes$country)),
+                           selected = unique(athletes$country),
+                           options = list(`actions-box` = TRUE),multiple = T),
+               
+               pickerInput("sport_input","Sport", 
+                           choices=sort(unique(athletes$Sport)),
+                           selected = unique(athletes$Sport),
+                           options = list(`actions-box` = TRUE),multiple = T),
+               
+               sliderInput("year_imput", "Time Line",
+                           min=yearRange[1], max=yearRange[2], value=yearRange,width="100%",sep="",animate=TRUE
+               )
+        ),
+        column(width=8,
+               tabsetPanel(
+                   tabPanel("Map", plotlyOutput("world_map",height = 500)), 
+                   tabPanel("Top 10 Sports", plotOutput("lineSports",height = 500)),
+                   tabPanel("Popular Events", plotOutput("word_cloud",height = 800))
+               )
+        )
+    )
 )
 
 server <- function(input, output) {
     
     observe(print(input$sideAge))
-    
     output$sideMedals <- renderPrint({ input$sideMedals })
-    
     output$sideAge <- renderPrint({ input$sideAge })
-    
     output$sideWeight <- renderPrint({ input$sideWeight })
     
     output$histAge <- renderPlot(
-        athletes %>% 
+        athletes %>%
             filter(Year>input$year_imput[1],
                    Year<input$year_imput[2],
                    country %in% input$country_input,
@@ -131,7 +125,7 @@ server <- function(input, output) {
                    Height <= input$sideHeight[2],
                    Medal_Value %in% input$sideMedals,
                    Sex %in% input$sideSex,
-                   Sport %in% input$sport_input) %>% 
+                   Sport %in% input$sport_input) %>%
             ggplot(aes(Age)) + 
             geom_histogram(binwidth=2, fill="#56B4E9") +
             theme_minimal() +
@@ -217,8 +211,8 @@ server <- function(input, output) {
                  y="Medals")+
             theme_classic()+
             theme(
-            legend.text=element_text(size=9))
-            
+                legend.text=element_text(size=9))
+        
     )
     
     output$world_map <- renderPlotly({
@@ -246,14 +240,14 @@ server <- function(input, output) {
         # specify map projection/options
         g <- list(
             showframe = FALSE,
-            showcoastlines = FALSE,
+            showcoastlines = TRUE,
             projection = list(type = 'Mercator')
         )
         
         
         p <- plot_geo(medals) %>%
             add_trace(
-                z = ~medal_count, color = ~medal_count, colors = 'Spectral',
+                z = ~medal_count, color = ~medal_count, colors = 'YlOrRd',
                 text = ~country, locations = ~CODE, marker = list(line = l)
             ) %>%
             colorbar(title = 'Medal Count') %>%
@@ -277,7 +271,7 @@ server <- function(input, output) {
                    Medal_Value %in% input$sideMedals,
                    Sex %in% input$sideSex,
                    Sport %in% input$sport_input) %>% 
-                   select(Event)
+            select(Event)
         
         myCorpus = Corpus(VectorSource(text))
         myCorpus = tm_map(myCorpus, content_transformer(tolower))
@@ -297,9 +291,8 @@ server <- function(input, output) {
         
         wordcloud_rep(names(v), v,scale=c(7,1.5),
                       size = 10, minRotation = -pi/2, maxRotation = -pi/2,
-                      min.freq = 10, max.feq=3000,
-                          colors=brewer.pal(8, "Spectral"))
-            
+                      max.words=50, colors=brewer.pal(8, "PuBu"))
+        
     })
 }
 
