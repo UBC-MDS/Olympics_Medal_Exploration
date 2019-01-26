@@ -19,3 +19,8 @@ Team Members
 | Shiny App Source Code | [Source Code](https://github.com/UBC-MDS/Olympics_Medal_Exploration/blob/master/Olympics_app/app.R) |
 | Deployed Shiny App | [Olympics Medal Exploration App](https://harjyotkaur.shinyapps.io/Olympics_app/) |
 <br>
+
+| Feedback | Github Link |
+|---|---|
+| Group 1| [Feedback Link](https://github.com/UBC-MDS/worldly-wines/issues/14) |
+| Group 2 | [Feedback Link](https://github.com/UBC-MDS/americas-safest-cities/issues/10) |
