@@ -119,7 +119,7 @@ ui <- fluidPage(
     ),
 
     
-    # this fluidRow contains the left sidebar and main content
+    # this fluidRow contains the left sidebar and tabs
     fluidRow(
           
         column(width=3, style=paste("background-color:",c1),
@@ -179,7 +179,7 @@ ui <- fluidPage(
     )
 )
 
-# 
+
 server <- function(input, output, session) {
 
   
@@ -201,7 +201,7 @@ server <- function(input, output, session) {
     })
     
     
-    # resets to original selections of widgets
+    # resets widgets to original selections
     observeEvent(input$reset, {
       shinyjs::reset("inpMedals")
       shinyjs::reset("inpSex")
