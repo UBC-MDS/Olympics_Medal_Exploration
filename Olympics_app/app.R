@@ -6,7 +6,7 @@
 # This is a Shiny web application. You can run the application by clicking
 # the 'Run App' button above.
 
- 
+
 
 # load packages
 suppressPackageStartupMessages(library(rsconnect))
@@ -21,12 +21,12 @@ suppressPackageStartupMessages(library(shinyjs))
 suppressPackageStartupMessages(library(shinyalert))
 
 
-# sidebar and top bar backgroud colour
-c1 <- "#f0f0f0"  
+# sidebar and top bar background color
+c1 <- "#f0f0f0"
 
 
 # load data
-df <- read.csv('2014_world_gdp_with_codes.csv',stringsAsFactors = FALSE) 
+df <- read.csv('2014_world_gdp_with_codes.csv',stringsAsFactors = FALSE)
 
 
 # data wrangling
@@ -65,23 +65,23 @@ mycss <- "
 
 
 ui <- fluidPage(
-  
+
     useShinyalert(),
     useShinyjs(),
-    
+
     # this first fluidRow is the top bar
     fluidRow(),
     fluidRow(
-        
+
         style = paste("background-color:",c1),
         column(width = 3,align="center",
            h2("Olympic Medal Explorer"),
            img(src="rings.png", width="50%")
         ),
-      
+
         br(),
         br(),
-        
+
         column(width = 1,
             strong("Medals"),
             checkboxGroupInput("inpMedals", label = NULL,
@@ -118,13 +118,13 @@ ui <- fluidPage(
         )
     ),
 
-    
+
     # this fluidRow contains the left sidebar and tabs
     fluidRow(
-          
+
         column(width=3, style=paste("background-color:",c1),
-            
-          
+
+
             pickerInput("inpCountry","Country",
                         choices=countries,
                         selected = countries,
@@ -146,26 +146,26 @@ ui <- fluidPage(
                         min=yearRange[1], max=yearRange[2],
                         value=yearRange,width="100%",sep="",animate=TRUE
             ),
-            
-            
+
+
             actionButton("help", strong("Help"),
                          icon = icon("info-circle")),
-            
-          
-            
+
+
+
             actionButton("reset", strong("Reset All"),
                          icon = icon("refresh")),
             br(),
             br()
         ),
-        
+
         column(width=8,
             tabsetPanel(
-                tabPanel("World Map", 
+                tabPanel("World Map",
                          br(),
                          br(),
                          plotlyOutput("world_map",height = 600)),
-                tabPanel("Compare Countries and Sports", 
+                tabPanel("Compare Countries and Sports",
                          br(),
                          br(),
                          plotOutput("lineSports",height = 600)),
@@ -182,7 +182,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
 
-  
+
     # this is the reactive object to filter data from all inputs
     df_filtered <- reactive({
         athletes %>%
@@ -199,8 +199,8 @@ server <- function(input, output, session) {
                Sex %in% input$inpSex,
                Sport %in% input$inpSport)
     })
-    
-    
+
+
     # resets widgets to original selections
     observeEvent(input$reset, {
       shinyjs::reset("inpMedals")
@@ -212,21 +212,21 @@ server <- function(input, output, session) {
       shinyjs::reset("inpSport")
       shinyjs::reset("inpYear")
     })
-    
-    
+
+
     # message for help button
     observeEvent(input$help, {
       shinyalert("Olympics Medal Explorer",
-                 paste0("This app showcases distribution of olympic medals 
+                 paste0("This app showcases distribution of olympic medals
                  across different countires. The distribution can be observed
-                 in various events over the past years. Users can explore this 
+                 in various events over the past years. Users can explore this
                  app by utilizing the wide array of filter options available.
                  To download data please visit ",
-                href="https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results"), 
+                href="https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results"),
                 type = "info")
     })
-    
-    
+
+
     # dynamic color scheme for plots
     # in accordance with medal selection
     c3 <- reactive({
@@ -238,8 +238,8 @@ server <- function(input, output, session) {
       }
       else return("Blues")
     })
-    
-    
+
+
     # dynamic color scheme for widgets
     # in accordance with medal selection
     c2 <- reactive({
@@ -251,8 +251,8 @@ server <- function(input, output, session) {
       }
       else return("dodgerblue4")
     })
-    
-    
+
+
     # top 4 countries
     df_top_countries <- reactive({
         df_filtered() %>%
@@ -260,8 +260,8 @@ server <- function(input, output, session) {
             tally() %>%
             top_n(5)
     })
-    
-    
+
+
     # age histogram
     output$histAge <- renderPlot(height=100,
         ggplot(df_filtered(), aes(Age)) +
@@ -275,8 +275,8 @@ server <- function(input, output, session) {
             xlim(ageRange[1],ageRange[2]) +
             labs(x = NULL, y = NULL)
     )
-    
-    
+
+
     # weight histogram
     output$histWeight <- renderPlot(height=100,
         ggplot(df_filtered(), aes(Weight)) +
@@ -290,8 +290,8 @@ server <- function(input, output, session) {
             xlim(weightRange[1],weightRange[2]) +
             labs(x = NULL, y = NULL)
     )
-    
-    
+
+
     # height histogram
     output$histHeight <- renderPlot(height=100,
         ggplot(df_filtered(), aes(Height)) +
@@ -306,7 +306,7 @@ server <- function(input, output, session) {
             labs(x = NULL, y = NULL)
     )
 
-    
+
     # year histogram
     output$histYear <- renderPlot(height=100,
         ggplot(df_filtered(), aes(Year)) +
@@ -321,7 +321,7 @@ server <- function(input, output, session) {
             labs(x = NULL, y = NULL)
     )
 
-    
+
     # faceted bar chart for sports and countries
     output$lineSports <- renderPlot(
         df_filtered() %>%
@@ -340,8 +340,8 @@ server <- function(input, output, session) {
                 xlim(yearRange) +
                 facet_grid(rows = vars(Sport), cols = vars(country))+
                 scale_fill_distiller(palette=c3())+
-                labs(caption="\n Note: The plot above has pre-selection of all countries and sports and thus showcases the top 5 countires and top 5 sports played. 
-                    On changing countires and sports from the side-bar user can compare other countries. There can be rare cases where there will be no data points 
+                labs(caption="\n Note: The plot above has pre-selection of all countries and sports and thus showcases the top 5 countires and top 5 sports played.
+                    On changing countires and sports from the side-bar user can compare other countries. There can be rare cases where there will be no data points
                     for that country/sport combination, and therefore you may see fewer than 5 countries shown. Nevertheless be very useable in the majority of cases.")+
             theme_bw()+
             theme(
@@ -349,11 +349,11 @@ server <- function(input, output, session) {
                 strip.text.x = element_text(size = 14, colour = "white",face = "bold"),
                 strip.text.y = element_text(size = 14, colour = "white",face = "bold"),
                 strip.background =element_rect(fill=c2()))
-    
+
     )
-    
-    
-    # chloropeth world map for medal count
+
+
+    # choropleth world map for medal count
     output$world_map <- renderPlotly({
 
         medals <- left_join(df_filtered(), df, by=c("country"="COUNTRY")) %>%
@@ -375,7 +375,7 @@ server <- function(input, output, session) {
             layout(geo = g)
     })
 
-    
+
     # word cloud for olympic events
     output$word_cloud <- renderPlot({
 
@@ -392,9 +392,9 @@ server <- function(input, output, session) {
 
         m = as.matrix(myDTM)
         v=sort(rowSums(m), decreasing = TRUE)
-        
+
         wordcloud_rep <- repeatable(wordcloud)
-        
+
         wordcloud_rep(names(v), v,scale=c(5,1),
                       size = 10, minRotation = -pi/2, maxRotation = -pi/2,
                       max.words=40, colors=brewer.pal(8,c3())
